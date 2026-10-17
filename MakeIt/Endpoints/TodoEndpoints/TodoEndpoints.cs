@@ -19,10 +19,6 @@ public static class TodoEndpoints
         // get all todos
         group.MapGet("/", GetTodos);
 
-        // Get a particular todo with id
-        group.MapGet("/{id}", GetTodo)
-        .WithName(nameof(GetTodo));
-
         // Create todo in database
         group.MapPost("/", CreateTodo);
 
@@ -45,19 +41,6 @@ public static class TodoEndpoints
         return Results.Ok(result);
     }
 
-    private static async Task<IResult> GetTodo(int id, MakeItContext dbContext)
-    {
-        var todo = await dbContext.Todos
-                            .FindAsync(id);
-
-        if (todo == null)
-        {
-            return Results.NotFound();
-        }
-
-        return Results.Ok(todo.ToDto());
-    }
-
     private static async Task<IResult> CreateTodo(MakeItContext dbContext, CreateTodoDto createTodoDto)
     {
         var newTodo = createTodoDto.ToEntity();
@@ -68,7 +51,7 @@ public static class TodoEndpoints
 
         TodoDto returnTodo = newTodo.ToDto();
 
-        return Results.CreatedAtRoute(nameof(GetTodo), new { id = returnTodo.Id }, returnTodo);
+        return Results.Created(uri: (string?)null, value: returnTodo);
 
     }
 
